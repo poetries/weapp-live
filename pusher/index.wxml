@@ -1,0 +1,113 @@
+<layer-page-common loaded="{{loaded}}" loading="{{loading}}" error="{{error}}" actions="{{erroractions}}">
+  <view slot="main">
+
+    <view id='video-box'>
+      <live-pusher
+        class="pusher"
+        id="pusher"
+        mode="RTC"
+        beauty="4"
+        whiteness="4"
+        url="{{mainData.streamPushUrl}}"
+        bindstatechange="handleStateChange">
+      </live-pusher>
+    </view>
+
+    <!-- 顶部操作栏 -->
+    <view class="top-action">
+      <view class="avatar-wrapper">
+        <view class="avatar">
+          <image src="{{mainData.portraitUrl}}" class="avatar-wrapper__icon" />
+        </view>
+        <view class="userinfo_wrapper">
+          <view class="avatar-wrapper__room">{{mainData.roomName}}</view>
+          <view class="avatar-wrapper__pusher">{{mainData.hostName}}</view>
+        </view>
+      </view>
+      <text class="top-action__info-text">已直播：{{livedTime}}</text>
+    </view>
+
+    <!-- 视频操作 -->
+    <view class="push-control">
+      <!-- 切换摄像头 -->
+      <view wx:if="{{(pusherState === 'start')}}" class="control-item">
+        <view class="control-item-icon">
+          <image src="{{IMAGE_SERVICE+'pusher-switch.png'}}" class="control-icon" bindtap="handleSwitch" mode="aspectFit" />
+        </view>
+        <view class="control-item-title">翻转</view>
+      </view>
+
+      <!-- 开始推流 -->
+      <view wx:if="{{(pusherState === undefined)}}" class="control-item">
+        <view class="control-item-icon">
+          <image src="{{IMAGE_SERVICE+'pusher-play.png'}}" class="control-icon" bindtap="handlePusherStart" mode="aspectFit" />
+        </view>
+        <view class="control-item-title">{{mainData.liveStatus === 0 ? "开始" : "继续直播"}}</view>
+      </view>
+
+      <!-- 暂停推流 -->
+      <view wx:if="{{(pusherState === 'start')}}" class="control-item">
+        <view class="control-item-icon">
+          <image src="{{IMAGE_SERVICE+'pusher-pause.png'}}" class="control-icon" bindtap="handlePusherPause" mode="aspectFit" />
+        </view>
+        <view class="control-item-title">暂停</view>
+      </view>
+
+      <!-- 重新推流 -->
+      <view wx:if="{{(pusherState === 'pause')}}" class="control-item">
+        <view class="control-item-icon">
+          <image src="{{IMAGE_SERVICE+'pusher-play.png'}}" class="control-icon" bindtap="handlePusherResume" mode="aspectFit" />
+        </view>
+        <view class="control-item-title">继续</view>
+      </view>
+
+      <!-- 结束直播 -->
+      <view wx:if="{{(pusherState !== undefined)}}" class="control-item">
+        <view class="control-item-icon">
+          <image src="{{IMAGE_SERVICE+'pusher-shutdown.png'}}" class="control-icon" bindtap="handlePusherOver" mode="aspectFit" />
+        </view>
+        <view class="control-item-title">结束直播</view>
+      </view>
+    </view>
+
+    <!-- 视频出错 -->
+    <view wx:if="{{(pusherState === 'error')}}" class="push-error-mask">
+      <view class="push-error">
+        <text class="push-error-text">直播失败</text>
+        <text class="push-error-text">请重新进入直播间</text>
+      </view>
+    </view>
+
+    <!-- 聊天信息 -->
+    <scroll-view class="msgs-wrapper" scroll-y scroll-with-animation="true" scroll-top="{{msgScrollTop}}">
+      <view class="msgs" wx:for="{{msgs}}" wx:key="index">
+        <text class="msg-item">
+          <text class="nickname">{{item.fromAccountNick}}</text> : {{item.content}}</text>
+      </view>
+      <view class="msgs" wx:if="{{systemTips}}">
+        <text class="msg-item system-info animated slideOutLeft delay-1s">
+          <text class="nickname">{{mainData.projectName}}</text> : <text class="msg-item__tips-text">{{systemTips}}</text></text>
+      </view>
+    </scroll-view>
+
+    <view class="input-section" wx:if="{{isInput}}" style="{{inputMarBot?'margin-bottom:20rpx':''}}">
+      <input value="{{msgContent}}" placeholder="说点什么" bindconfirm="onConfirm" placeholder-class="inp-placeholder" auto-focus confirm-type="send" bindfocus='settingMbShow' bindblur='settingMbNoShow' bindinput="bindinput"/>
+    </view>
+
+    <!-- footer -->
+    <view class="footer-action">
+      <view class="left-action">
+        <view class="input-btn" bindtap="showInput" wx:if="{{!isInput}}">
+          <text class="input-btn__text">说点什么...</text>
+        </view>
+      </view>
+      <view class="right-action" wx:if="{{!isInput || !inputMarBot}}">
+        <!-- 分享 -->
+        <button open-type="share" class="share-btn">
+          <image src="{{IMAGE_SERVICE+'assets/share.png'}}" class="share-btn"/>
+        </button>
+      </view>
+    </view>
+
+  </view>
+</layer-page-common>

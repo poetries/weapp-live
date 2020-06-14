@@ -1,0 +1,110 @@
+<layer-page-common loaded="{{loaded}}" loading="{{loading}}" error="{{error}}" actions="{{erroractions}}">
+  <view slot="main">
+
+    <view id='video-box'>
+      <live-player
+        wx:if="{{mainData.streamPlayUrl}}"
+        class="player"
+        id="player"
+        src="{{mainData.streamPlayUrl}}"
+        mode="RTC"
+        autoplay
+        bindstatechange="statechange"
+        bindnetstatus="handleNetStatus"
+        binderror="handleError"
+        object-fit="fillCrop">
+      </live-player>
+    </view>
+
+    <!-- 顶部操作栏 -->
+    <view class="top-action">
+      <view class="avatar-wrapper">
+        <view class="avatar">
+          <image src="{{mainData.portraitUrl}}" class="avatar-wrapper__icon" />
+        </view>
+        <view class="userinfo_wrapper">
+          <view class="avatar-wrapper__room">{{mainData.roomName}}</view>
+          <view class="avatar-wrapper__pusher">{{mainData.hostName}}</view>
+        </view>
+      </view>
+      <text class="top-action__info-text">已直播：{{livedTime}}</text>
+    </view>
+
+    <!-- 视频出错 -->
+    <view wx:if="{{(playerStatus === 'error')}}" class="push-error-mask">
+      <view class="push-error">
+        <text class="push-error-text">直播失败</text>
+        <text class="push-error-text">请重新进入直播间</text>
+      </view>
+    </view>
+    
+     <!-- 停止播放 -->
+    <view wx:if="{{(playerStatus === 'stop')}}" class="push-error-mask">
+      <view class="push-error">
+        <text class="push-error-text">直播结束</text>
+        <text class="push-error-text">请退出直播间</text>
+      </view>
+    </view>
+
+    <!-- 聊天信息 -->
+    <scroll-view class="msgs-wrapper" scroll-y bindscroll="onMsgScroll" scroll-with-animation="true" scroll-top="{{msgScrollTop}}" enable-back-to-top="true">
+      <view class="msgs" wx:for="{{msgs}}" wx:key="index">
+        <text class="msg-item">
+          <text class="nickname">{{item.fromAccountNick}}</text> : {{item.content}}</text>
+      </view>
+      <view class="msgs" wx:if="{{systemTips && !endLiveTips && isFans}}">
+        <text class="msg-item system-info animated slideOutLeft delay-1s">
+          <text class="nickname">{{mainData.projectName}}</text> : <text class="msg-item__tips-text">{{systemTips}}</text></text>
+      </view>
+      <view class="msgs" wx:if="{{endLiveTips}}">
+        <text class="msg-item system-info animated">
+          <text class="nickname">{{mainData.projectName}}</text> : <text class="msg-item__tips-text">{{endLiveTips}}</text></text>
+      </view>
+    </scroll-view>
+
+    <view class="input-section" wx:if="{{isInput}}" style="{{inputMarBot?'margin-bottom:20rpx':''}}">
+      <input value="{{msgContent}}" placeholder="说点什么" bindconfirm="onConfirm" placeholder-class="inp-placeholder" auto-focus confirm-type="send" bindfocus='settingMbShow' bindblur='settingMbNoShow' bindinput="bindinput"/>
+    </view>
+
+    <!-- footer -->
+    <view class="footer-action">
+
+      <view class="left-action">
+        <view class="input-btn" bindtap="showInput" wx:if="{{!isInput}}">
+          <text class="input-btn__text">说点什么...</text>
+        </view>
+      </view>
+
+      <view class="right-action" wx:if="{{!isInput || !inputMarBot}}">
+        <!-- 礼物 -->
+        <image src="{{IMAGE_SERVICE+'assets/gift.png'}}" class="gift-btn" bindtap="onGiftTap"/>
+        <!-- 分享 -->
+        <button open-type="share" class="share-btn"><image src="{{IMAGE_SERVICE+'assets/share.png'}}" class="share-btn" /></button>
+        <!-- 点赞 -->
+        <image src="{{IMAGE_SERVICE+'assets/like.png'}}" class="like-icon" bindtap="onLikeTap"/>
+      </view>
+
+      <view class="float-menu">
+        <!-- 去项目 -->
+        <image src="{{IMAGE_SERVICE+'assets/project.png'}}" class="float-menu__btn float-menu__pro" bindtap="goProject"  />
+        <!-- 领火箭 -->
+        <image wx:if="{{(giftStatus === 0)}}" src="{{IMAGE_SERVICE+'assets/l_rocket.png'}}" class="float-menu__btn float-menu__rocket" bindtap="binRocket"  />
+      </view>
+
+      <!-- 火箭动画 -->
+      <view animation="{{ani}}" style="height:0;text-align:center">
+        <image src="{{IMAGE_SERVICE+'assets/rocket_img.png'}}" wx:if="{{ani}}" style="{{rocketVisible ? 'width: 619rpx; height: 1325rpx;' : 'width:0;height:0'}}" />
+      </view>
+
+    </view>
+
+    <!-- 点赞 -->
+    <like-comp count="{{count}}" />
+
+    <!-- 弹出层 -->
+    <custom-modal show="{{modalVisible}}" height="{{770}}" bindcancel="bindcancel" bindconfirm="bindConfirm" btnText="送出火箭*1">
+      <image src="{{IMAGE_SERVICE+'assets/rocket_img.png'}}" class="rocket_img" />
+    </custom-modal>
+
+  </view>
+</layer-page-common>

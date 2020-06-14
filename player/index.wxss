@@ -1,0 +1,37 @@
+@import '../../utilities/live.wxss';
+
+.player {
+  width: 100vw;
+  height: 100vh;
+  display: block;
+}
+.push-error {
+  padding: 20rpx 40rpx;
+  text-align: center;
+  line-height: 42rpx;
+  border-radius: 6rpx;
+  background-color: rgba(0,0,0,.8);
+}
+.push-error-text {
+  display: block;
+  color: #FFF;
+  font-size: 28rpx;
+}
+
+/* 推流失败 */
+.push-error-mask {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+
+  display: -webkit-flex;
+  display: -moz-flex;
+  display: -ms-flex;
+  display: -o-flex;
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+}
